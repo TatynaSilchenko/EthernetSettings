@@ -1,42 +1,48 @@
-import React, {useState} from 'react';
+import React from 'react';
 import s from "./Settings.module.css"
 import {Field} from "redux-form";
 import {Input} from "../features/formControls/formControls";
-import {ipAddressShow, required} from "../features/validates/validates";
+import { ipCorrect, required} from "../features/validates/validates";
+import UsedAddress from "./UsedAddress";
 
-const IPComponent=(props)=>{
-    let [kindIP, setKindIP] = useState('auto')
-    let onChangeKind = (e) => {
-        setKindIP(e.currentTarget.value)
+class DNSComponent extends React.Component {
+    constructor() {
+        super()
+        this.state = {
+            kindDNS: false
+        }
     }
-    return <div className={s.ipWrapper}>
-        <label className={s.choiseIP}>
-            <Field name="ipAddressChoice" component='input' className={s.radioBtn}
-                   onChange={onChangeKind} type="radio" value='auto' />
-            Obtain an IP address automatically</label>
-        <label className={s.choiseIP}><Field name="ipAddressChoice" component='input' className={s.radioBtn}
-                                             onChange={onChangeKind} type="radio" value='following'/>
-            Use the following IP address:</label>
-        <div className={s.followingIPInfo}>
-            <div className={s.addInfo}>
-                <label>IP address: <span>*</span></label>
-                <Field component={Input} type='text' className={s.infoField}
-                       name='ipAddress' kindIP={kindIP}
-                       validate={[required, ipAddressShow]}/>
-            </div>
-            <div className={s.addInfo}>
-                <label>Subnet Mask: <span>*</span></label>
-                <Field component={Input} type='text'
-                       name='subnetMask' kindIP={kindIP}
-                       validate={[required, ipAddressShow]}/>
-            </div>
-            <div className={s.addInfo}>
-                <label>Default Gateway: </label>
-                <Field component={Input} type='text'
-                       name='defaulGateWay' kindIP={kindIP}/>
+   onChangeKind = (e) => {
+        debugger
+        this.setState(prevState => {
+            return {kindDNS: !prevState.kindDNS}
+        })
+    }
+
+    render() {
+        let disableStyle = [!this.state.kindDNS  && s.disableLable,
+            this.state.kindDNS && s.activeLable].filter(e => !!e)
+            .join(' ')
+        return <div className={s.ipWrapper}>
+            <UsedAddress name={this.props.nameRadio} onChangeKind={this.onChangeKind}
+                         text={'DNS server '} dhtp={''} isWifi={this.props.isWifi}
+                         disable={this.props.disable}/>
+            <div className={s.followingIPInfo}>
+                <div className={s.addInfo}>
+                    <label className={disableStyle}>Preffered DNS server: <span>*</span></label>
+                    <Field component={Input} type='text' className={s.infoField}
+                           name={this.props.dnsServer} kind={this.state.kindDNS }
+                           validate={this.state.kindDNS  && [required, ipCorrect]}/>
+                </div>
+                <div className={s.addInfo}>
+                    <label className={disableStyle}>Alternative DNS server: </label>
+                    <Field component={Input} type='text'
+                           name={this.props.dnsAlternativeServer} kind={this.state.kindDNS }/>
+                </div>
+
             </div>
         </div>
-    </div>
+    }
 }
 
-export default IPComponent
+export default DNSComponent
