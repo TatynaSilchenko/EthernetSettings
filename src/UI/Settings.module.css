@@ -12,7 +12,6 @@
     width: 80%;
     box-shadow: 0 0 0 14px #f1f3f2;
     color: #827171;
-    overflow: hidden;
 
 }
 
@@ -32,7 +31,7 @@
     align-items: start;
     padding: 0 16px 16px 16px;
     width: 50%;
-    overflow: hidden;
+
 }
 
 .columnSettings:nth-child(1) {
@@ -54,6 +53,7 @@
 
 h5 {
     color: black;
+    margin-bottom: 10px;
 }
 
 .checkmark {
@@ -104,6 +104,7 @@ h5 {
 
 .ipWrapper label {
     margin-bottom: 13px;
+    margin-right: 15px;
 }
 
 .followingIPInfo {
@@ -126,11 +127,13 @@ span {
 
 .addInfo {
     display: flex;
+    justify-content: flex-end;
+    width: 100%;
     margin-bottom: 10px;
 }
 
 .addInfo input, .securityInfo input {
-    width: 28em;
+    width: 100%;
     height: 30px;
     border: 1px solid #7e87af;
     position: relative;
@@ -138,6 +141,8 @@ span {
 
 .inputWrapper {
     display: flex;
+    width:60%;
+
 }
 
 .securityInfo {
@@ -146,8 +151,11 @@ span {
     width: 100%;
 }
 
+.selectWrapper{
+    width:53%;
+}
 .addInfo select {
-    width: 267px;
+    width: 100%;
     height: 30px;
     border: 1px solid #7e87af;
     position: relative;

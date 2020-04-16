@@ -6,67 +6,71 @@ import {required} from "../features/validates/validates";
 import repeat from "../assets/repeat.svg"
 import IPComponent from "./IPComponent";
 import DNSComponent from "./DNSComponent";
+import cn from "classnames";
 
-class WifiComponent extends React.Component {
-    constructor() {
-        super()
-        this.state = {
-            wifi: false,
-            wifiSecurity:false
-        }
-    }
+let WifiComponent =(props)=> {
 
-    setAnable = (e) => {
-        let nameField=e.currentTarget.name
-        this.setState(prevState => {
-            return {[nameField]: !prevState[nameField]}
+        let networkType = props.networkType;
+        let wifiMode = props.currentValues[networkType]
+            ? props.currentValues[networkType].wifiMode
+            : props.initialValues[networkType].wifiMode;
+        let isSecurityKey=props.currentValues[networkType]
+            ? props.currentValues[networkType].isSecurityKey
+            : props.initialValues[networkType].isSecurityKey;
+        const disableWifiSettings =!wifiMode
+        const disableSecurityKey =!isSecurityKey
+
+        let disableClassesWiFi = cn({
+            [s.disableLable]: disableWifiSettings,
         })
-    }
+        let disableClassesKey = cn({
+            [s.disableLable]: disableSecurityKey,
+        })
 
-    render() {
-        let disableStyleWifiEnable = [!this.state.wifi && s.disableLable, this.state.wifi && s.secu]
-            .filter(e => !!e).join(' ')
-        let disableStyleSecurityKey = [!this.state.wifiSecurity && s.disableLable, this.state.wifiSecurity && s.activeLable]
-            .filter(e => !!e).join(' ')
         return <div className={s.ipWrapper}>
             <div className={s.enable}>
                 <div>
-                    <lable><Field name='wifi' component='input'
-                                  type='checkBox' onChange={this.setAnable}
-                                  className={s.checkmark} value={this.state.wifi}/>
+                    <lable><Field name={networkType + "." + props.nameCheckBox} component='input'
+                                  type='checkBox' checked={wifiMode} className={s.checkmark} />
                         Enable wifi
                     </lable>
                 </div>
-                <div className={[s.addInfo, s.searchWiFiName].join(' ')}><label className={disableStyleWifiEnable}>Wireless
+                <div className={[s.addInfo, s.searchWiFiName].join(' ')}>
+                    <label className={disableClassesWiFi}>Wireless
                     Network Name <span>*</span></label>
-                    <Field name="wifiName" component={Select} type='select' kind={this.state.wifi} validate={this.state.wifi && [required]}/>
-                    <div className={[s.repeatCircle,!this.state.wifi&&s.disabledRepatIcon].join(' ')}>
+                    <Field name={networkType + ".wifiName"} component={Select} type='select'
+                           disabled={!wifiMode} validate={wifiMode && [required]}/>
+
+                    <div className={[s.repeatCircle,!wifiMode&&s.disabledRepatIcon].join(' ')}  onClick={()=>alert('search new networks')}>
                         <img src={repeat} alt="repeat icon" className={s.repeatIcon}/></div>
                 </div>
             </div>
             <div className={s.enable}>
-                <lable className={[disableStyleWifiEnable,s.securityTitle].join(' ')}><Field name='wifiSecurity' component='input'
-                                                       type='checkBox' onChange={this.setAnable}
-                                                       className={s.checkmark} disabled={!this.state.wifi}/>
+                <lable className={[disableClassesWiFi,s.securityTitle].join(' ')}>
+                    <Field name={networkType + ".isSecurityKey"} component='input'
+                           type='checkBox' className={s.checkmark} disabled={!wifiMode}
+                           checked={isSecurityKey}/>
                     Enable Wireless Security
                 </lable>
                 <div className={s.securityInfo}>
-
-                    <div className={s.securityKey}><label className={disableStyleSecurityKey}>Securety Key: <span>*</span></label>
-                        <Field component={Input} type='text' className={s.infoField}
-                               name='securityKey' kind={this.state.wifiSecurity}
-                               validate={this.state.wifiSecurity&& [required]}/>
+                    <div className={s.securityKey}>
+                        <label className={disableClassesKey}>Securety Key: <span>*</span></label>
+                        <Field component={Input} type='text' className={s.infoField} disabled={!isSecurityKey}
+                               name={networkType + ".securityKey"}/>
                     </div>
                 </div>
             </div>
-            <IPComponent nameRadio={"isEditeIPWifi"} isWifi={this.state.wifi} ipAddess={'ipAddressWifi'}
+
+            <IPComponent nameRadio={"ipMode"}  ipAddess={'ipAddressWifi'}
                          subnetMask={'subnetMaskWifi'} defaulGateWay={'defaulGateWayWifi'}
-                         disable={!this.state.wifi&&'notEnable'}{...this.props}/>
-            <DNSComponent nameRadio={"isEditeWifi"} dnsServer={'dnsServerWifi'}  isWifi={this.state.wifi}
+                         networkType={props.networkType} wifiMode={wifiMode}
+                         disableClassesWifi={disableClassesWiFi}{...props}/>
+            <DNSComponent nameRadio={"dnsMode"} dnsServer={'dnsServerWifi'}
                           dnsAlternativeServer={'dnsAlternativeServerWifi'}
-                          disable={!this.state.wifi&&'notEnable'}{...this.props}/>
+                          networkType={props.networkType} wifiMode={wifiMode}
+                          disableClassesWifi={disableClassesWiFi}{...props}/>
         </div>
     }
-}
+
 
 export default WifiComponent

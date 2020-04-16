@@ -1,16 +1,18 @@
-import React, {useState} from 'react';
+import React from 'react';
 import s from "./Settings.module.css"
-import {reduxForm} from "redux-form";
-import {connect} from "react-redux";
+import {formValueSelector, reduxForm} from "redux-form";
+import {connect, useDispatch} from "react-redux";
 import IPComponent from "./IPComponent";
 import DNSComponent from "./DNSComponent";
-import WifiComponent from "./WifiComponent";
 import {reset} from 'redux-form';
+import WifiComponent from "./WifiComponent";
+import {ethernetSettings} from "../BLL/settingsReducer";
 
 const Settings = (props) => {
-
+    let dispatch=useDispatch()
     let saveSettings = (values) => {
-        console.log(values);
+        dispatch(ethernetSettings(values.ethernet,values.wifi))
+
     }
     return <div className={s.settings__wrapper}>
         <AddSettingsForm onSubmit={saveSettings}  {...props}/>
@@ -19,48 +21,45 @@ const Settings = (props) => {
 
 let AddSettingsForm = (props) => {
     return (
-        <form onSubmit={props.handleSubmit} className={s.settings__form}>
+        <form onSubmit={props.handleSubmit}  className={s.settings__form}>
             <div className={s.settings__choice}>
                 <div className={s.columnSettings}>
                     <h5>EthernetSettings</h5>
-                    <IPComponent nameRadio={"isEditeIP"} ipAddess={'ipAddress'}
-                                 subnetMask={'subnetMask'} defaulGateWay={'defaulGateWay'}
+                    <IPComponent nameRadio={"ipMode"} ipAddess={"ipAddress"}
+                                 subnetMask={"subnetMask"} defaulGateWay={"defaulGateWay"}
+                                 networkType={"ethernet"} wifiMode={false} disableClassesWifiv={null}
                                  {...props}/>
-                    <DNSComponent nameRadio={"isEditeDNS"} dnsServer={'dnsServer'} dnsAlternativeServer={'dnsAlternativeServer'}{...props}/>
-                    {/*<DNSComponent nameRadio={"isEditeDNS"} {...props}/>*/}
+                    <DNSComponent nameRadio={"dnsMode"} dnsServer={'dnsServer'}
+                                  dnsAlternativeServer={'dnsAlternativeServer'}
+                                  networkType={"ethernet"} wifiMode={false} disableClassesWifiv={null}
+                                  {...props}/>
                 </div>
                 <div className={s.columnSettings}>
-                    <h5>Wireless Settings</h5>
-                  <WifiComponent {...props}/>
+                   <h5>Wireless Settings</h5>
+                    <WifiComponent  nameCheckBox={"wifiMode"} networkType={"wifi"}{...props}/>
                 </div>
             </div>
             <div className={s.settings__submit}>
                 <button type="submit" className={s.submite}>Save</button>
                 <button type="button" className={s.cancelBtn} onClick={props.reset}>Cancel</button>
-
-
-                {/*<Submit {...props} title={'Save'} style={{backgroundColor: '#1aa8eb', color: 'white'}}/>*/}
-                {/*<Submit title={'Cancel'}/>*/}
             </div>
         </form>
     )
 }
 const mapStateToProps = (state) => {
     return {
-        initialValues: {
-            isEditeIP: state.settings.isEditeIP,
-            isEditeDNS: state.settings.isEditeDNS,
-            isEditeIPWifi: state.settings.isEditeIPWifi,
-            isEditeWifi: state.settings.isEditeWifi,
-            wifi: state.settings.wifi
+        initialValues: state.settings,
+        currentValues: {
+            ethernet: formValueSelector("addSettings")(state, "ethernet"),
+            wifi: formValueSelector("addSettings")(state, "wifi")
         }
     }
 }
 
 AddSettingsForm = connect(mapStateToProps)(reduxForm({
     form: 'addSettings', enableReinitialize: true,
-    onSubmitSuccess:(result, dispatch, props) => {
-       return  dispatch(reset(props.form))
+    onSubmitSuccess: (result, dispatch, props) => {
+        return dispatch(reset(props.form))
     }
 })(AddSettingsForm))
 export default Settings
