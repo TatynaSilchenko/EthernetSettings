@@ -1,14 +1,10 @@
 
 const api = {
-
-    loadForm(data) {
-        return new Promise((resolve) => {
-
-            resolve({
+    sendSettings(data) {
+        return Promise.resolve({
                 status: 200,
                 data: data
             })
-        })
     }
 }
 export default api

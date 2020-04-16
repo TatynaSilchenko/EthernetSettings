@@ -1,45 +1,54 @@
-import React from 'react';
-import s from "./Settings.module.css"
-import {Field} from "redux-form";
-import {Input} from "../features/formControls/formControls";
-import {ipCorrect, required} from "../features/validates/validates";
-import UsedAddress from "./UsedAddress";
-import cn from "classnames";
+import React from 'react'
+import s from './Settings.module.css'
+import {Field} from 'redux-form'
+import {Input} from '../features/formControls/formControls'
+import {ipCorrect, required} from '../features/validates/validates'
+import RadioButtons from './RadioButtons'
+import cn from 'classnames'
+import {ipModes, networkTypes} from '../redux/networkSettingsReducer'
 
 let IPComponent = (props) => {
-
     let {networkType} = props;
+
     let ipMode = props.currentValues[networkType]
         ? props.currentValues[networkType].ipMode
         : props.initialValues[networkType].ipMode;
-    const disableInputs = ipMode === "dinamic" || (networkType === 'wifi' && !props.wifiMode)
 
+    const disableInputs = ipMode === ipModes.DYNAMIC || (networkType === networkTypes.WIFI && !props.wifiMode)
+    const disableRadioButtons = props.networkType === networkTypes.WIFI && !props.wifiMode
     let disableClasses = cn({
         [s.disableLable]: disableInputs,
     })
+    const getName = (name) => networkType + '.' + name
+
     return <div className={s.ipWrapper}>
-        <UsedAddress name={networkType + "." + props.nameRadio} text={'an IP '}
-                     dhtp={'(DHCP/BootP)'} networkType={props.networkType}
-                     disableClasses={props.disableClassesWifi}
-                     wifiMode={props.wifiMode}/>
+        <RadioButtons name={getName(props.radioName)}
+                      option1Text={'Obtain an IP server address automatically (DHTP/BootP)'}
+                      option2Text={'Use the following IP address:'}
+                      option1Value={ipModes.DYNAMIC}
+                      option2Value={ipModes.STATIC}
+                      networkType={props.networkType}
+                      disableClasses={props.disableClassesWifi}
+                      wifiMode={props.wifiMode}
+                      disableRadioButtons={disableRadioButtons}/>
         <div className={[s.ipInfoBlock]}>
             <div className={s.addInfo}>
                 <label className={disableClasses}>IP address: <span>*</span></label>
-                <Field component={Input} type='text' name={networkType + "." + props.ipAddess}
-                       validate={ipMode === "static" ? [required, ipCorrect] : []}
+                <Field component={Input} type='text' name={getName(props.ipAddess)}
+                       validate={ipMode === ipModes.STATIC ? [required, ipCorrect] : []}
                        disabled={disableInputs}/>
             </div>
             <div className={s.addInfo}>
                 <label className={disableClasses}>Subnet Mask: <span>*</span></label>
                 <Field component={Input} type='text'
-                       name={networkType + "." + props.subnetMask}
-                       validate={ipMode === "static" ? [required, ipCorrect] : []}
+                       name={getName(props.subnetMask)}
+                       validate={ipMode === ipModes.STATIC ? [required, ipCorrect] : []}
                        disabled={disableInputs}/>
             </div>
             <div className={s.addInfo}>
                 <label className={disableClasses}>Default Gateway: </label>
                 <Field component={Input} type='text'
-                       name={networkType + "." + props.defaulGateWay} disabled={disableInputs}/>
+                       name={getName(props.defaulGateWay)} disabled={disableInputs}/>
             </div>
         </div>
     </div>

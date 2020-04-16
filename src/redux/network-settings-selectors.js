@@ -1,0 +1,1 @@
+export const getNetworkSettings = (state) => state.settings
